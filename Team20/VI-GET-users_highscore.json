@@ -1,0 +1,18 @@
+{"user":
+    [	
+        {
+            "user_name" : "Mauriz", 
+            "score" : 100,
+        },
+        {
+            "user_name" : "John", 
+            "score" : 99,
+        },
+        {
+            "user_name" : "Leo", 
+            "score" : 89,
+        }
+    ]
+}
+
+

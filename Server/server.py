@@ -39,17 +39,36 @@ async def test(param : str):
 async def read_all_items():
     return data.get_elements()
 
-@app.get("/v1/items/{item_id}", response_model=MyInventoryElement)
-async def read_item(item_id: int):
-    return data.get_element(item_id)
+@app.get("api/v1/users/highscore", response_model=MyInventoryElement)
+async def all_user_scores():
+    data = load_all_data()
+    user_scores = []
+    for user in data:
+        users = {"name":user['name'], "highscore" :user['highscore']}
+        user_scores.append(users)
+    return user_scores 
+'''
+    print('HighscoreList:\n-------------')    
+    for user in sorted(user_scores, key = lambda item: item['highscore'], reverse=True):
+        user_name = user['name']
+        user_score = str(user['highscore'])
+        print(f"{user_score.rjust(3,' ')} - {user_name}")
+    print('-------------')  
+'''
 
-@app.put("/v1/items/{item_id}", response_model=MyInventoryElement, status_code = 200)
-async def change_item(item_id, element: MyInventoryElement, response : Response):
-    state, element = data.update_element(item_id, element)
-    print("Status: " , state)
-    if state == 1:
-        response.status_code = status.HTTP_201_CREATED
-    return element 
+@app.put("api/v1/answer}", response_model=MyInventoryElement, status_code = 200)
+async def update_user(user_name, score):
+    data = load_all_data()
+    for user in data:
+        if user_name in user['name']:
+            user_highscore = user['highscore']
+            user_highscore += score
+            if user_highscore < 0:
+                user['highscore'] = 0
+            else:
+                user['highscore'] = user_highscore
+    with open(filename, 'w') as json_file:
+        json.dump(data, json_file, indent=4
 
 @app.delete("/v1/items/{item_id}", response_model=int)
 async def delete_item(item_id: int):

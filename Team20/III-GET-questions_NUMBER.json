@@ -1,0 +1,25 @@
+{"question":
+    [	
+        {
+            "ID" : 1, 
+            "question" : "Wie heisst du?",
+            "Options": [
+            "Mauriz", "John", "Leo"
+               ]
+        },
+         {
+             "ID" : 2, 
+             "question" : "Wie heisse ich?",
+             "Options": [
+             "Mauriz", "John", "Leo"
+                ]
+         },
+          {
+              "ID" : 2, 
+              "question" : "Name?",
+              "Options": [
+              "Mauriz", "John", "Leo"
+                 ]
+          }
+    ]
+}

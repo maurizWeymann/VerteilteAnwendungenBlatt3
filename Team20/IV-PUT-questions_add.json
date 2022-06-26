@@ -1,0 +1,8 @@
+{
+    "question" : "Wie heisst du?",
+    "answer" : "Mauriz",
+    "Options": [
+                "John", "Leo"
+               ]
+}
+
