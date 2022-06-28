@@ -7,7 +7,7 @@ type the following in your terminal to start the server
 python -m uvicorn server:app --reload
 """
 from fastapi import FastAPI, status, Response, HTTPException
-from mydata import MyInventoryElement, MyInventory, MyInventoryPostElement
+from mydata import MyInventoryPostElement, MyInventoryElement, MyInventory
 from typing import List
 import uvicorn
 
@@ -28,13 +28,14 @@ data.add_element(MyInventoryElement(name = "table", quantity = 6))
 # CRUD
 # CREATE, READ, UPDATE, DELETE
 
-@app.get("/", response_model=str)
-async def test(param : str):
-    print(param)
+@app.get("/")
+async def test():
+    message = "hello"
+    print(message)
     # raise HTTPException(status_code=409, detail="Nickname already registered")
-    return param
+    return message
 
-
+'''
 @app.get("/v1/items", response_model=List[MyInventoryElement])
 async def read_all_items():
     return data.get_elements()
@@ -48,6 +49,8 @@ async def all_user_scores():
         user_scores.append(users)
     return user_scores 
 '''
+
+'''
     print('HighscoreList:\n-------------')    
     for user in sorted(user_scores, key = lambda item: item['highscore'], reverse=True):
         user_name = user['name']
@@ -56,6 +59,7 @@ async def all_user_scores():
     print('-------------')  
 '''
 
+'''
 @app.put("api/v1/answer}", response_model=MyInventoryElement, status_code = 200)
 async def update_user(user_name, score):
     data = load_all_data()
@@ -78,7 +82,7 @@ async def delete_item(item_id: int):
 async def create_item(item : MyInventoryPostElement):
     return data.add_element(MyInventoryElement(name = item.name, quantity = item.quantity))
 
-
+'''
 if __name__ == '__main__':
-    uvicorn.run("main:app", host="0.0.0.0", port=22222, log_level='debug')
+    uvicorn.run("main:app", host="0.0.0.0", port=22222, log_level='debug', reload=True)
 
