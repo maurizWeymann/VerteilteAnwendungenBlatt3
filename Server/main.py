@@ -69,15 +69,20 @@ II Nutzer anmelden und Spiel starten
 async def login_user(user_name: str, password: str, response: Response):
     try:
         if user_name not in list(user_df["user_name"]):
-            user_df.loc[len(user_df)] = [user_name, password, 0]
-            response.status_code = status.HTTP_201_CREATED
-            return "new user created"
-        else:
             response.status_code = status.HTTP_403_FORBIDDEN
-            print(user_df)
-            return "user already in use"
+            return "bad credentials"
+        
+        else:
+            df = user_df.set_index("user_name", drop = False)
+            if password in df.loc[user_name]["password"]:
+                response.status_code = status.HTTP_202_ACCEPTED
+                return "successful logged in "
+            else:
+                response.status_code = status.HTTP_401_UNAUTHORIZED
+                return "wrong combination"
     except:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+
 
 '''
 III Fragen abrufen 
@@ -97,4 +102,4 @@ async def create_question():
 #user_df.loc[len(user_df),"password"] = [password]
 
 if __name__ == '__main__':
-    uvicorn.run("main:app", host="0.0.0.0", port=22224, log_level='debug')
+    uvicorn.run("main:app", host="0.0.0.0", port=22224, log_level='debug', reload = True)
