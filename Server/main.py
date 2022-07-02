@@ -41,9 +41,21 @@ user_df = pd.DataFrame(data, columns = [
     'password',
     'score',
     ])
+question_df = pd.DataFrame(data, columns = [
+    'id',
+    'question',
+    'answer',
+    'options',
+    ])
 
 
 user_df = user_df.append({"user_name":"mo", "password":"xyz123", "score":0}, ignore_index=True) 
+qustion_df = question_df.append({
+    "question" : "What is the first name of Iron Man?",
+    "answer" : "Tony",
+    "options":["Thomas","Antonio"],
+}, ignore_index=True) 
+
 
 '''
 I Nutzer anlegen und speichern 
@@ -95,9 +107,18 @@ async def load_questions(response:Response):
 '''
 IV Fragen hochladen und speichern
 '''
-@app.put("/api/v1/questions/add", status_code=200)
-async def create_question():
-    return 
+@app.put("/api/v1/questions/add")
+async def create_question(question: str, answer: str, options: str, response: Response):
+    try:
+        if question not in list(question_df["question"]):
+            question_df.loc[len(question_df)] = [question, answer, options]
+            response.status_code = status.HTTP_201_CREATED
+            return "new question created"
+        else:
+            response.status_code = status.HTTP_403_FORBIDDEN
+            return "already in place"
+    except:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
 #user_df.loc[len(user_df),"password"] = [password]
 
