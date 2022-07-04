@@ -1,0 +1,8 @@
+# Zeilenbasierte Daten
+34
+29
+# Noch ein Kommentar
+454877
+3951
+9691
+3932
