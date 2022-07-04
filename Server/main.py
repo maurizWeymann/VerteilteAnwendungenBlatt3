@@ -19,10 +19,11 @@ import pandas as pd
 import uvicorn
 import random
 import time
-
+from typing import List
 from yaml import load
 #from user import User 
 import json
+from mydata import User, Question, MyUsers    
 
 app = FastAPI(
     docs_url="/api/v1/docs",
@@ -32,12 +33,18 @@ app = FastAPI(
     openapi_url="/api/v1/openapi.json"
 )
 
+user_data = MyUsers()
+user_data.add_element(User(name = "cup", password = "xyz123"))
+
+user_data.get_elements()
+
+########################################################
 data = []
 names = []
 user_df = {}
 
 user_df = pd.DataFrame(data, columns = [
-    'user_name',
+    'name',
     'password',
     'score',
     ])
@@ -49,16 +56,26 @@ question_df = pd.DataFrame(data, columns = [
     ])
 
 
-user_df = user_df.append({"user_name":"mo", "password":"xyz123", "score":0}, ignore_index=True) 
-qustion_df = question_df.append({
+user_df = user_df.append({"name":"mo", "password":"xyz123", "score":0}, ignore_index=True) 
+user_df = user_df.append({"name":"mau", "password":"z1", "score":0}, ignore_index=True)
+question_df = question_df.append({
+    "id":len(question_df)+1,
     "question" : "What is the first name of Iron Man?",
     "answer" : "Tony",
     "options":["Thomas","Antonio"],
 }, ignore_index=True) 
+question_df = question_df.append({
+    "id":len(question_df)+1,
+    "question" : "Who is called the god of lightning in Avengers?",
+    "answer" : "Thor",
+    "options":["Thorsten","Torben"],
+}, ignore_index=True)
+print(question_df)
 
 
 '''
-I Nutzer anlegen und speichern 
+I Nutzer anlegen und speichern ohne Model
+'''
 '''
 @app.put("/api/v1/users/add")
 async def create_user(user_name: str, password: str, response: Response):
@@ -73,20 +90,39 @@ async def create_user(user_name: str, password: str, response: Response):
             return "user already in use"
     except:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-    
+''' 
+
+'''
+I Nutzer anlegen und speichern 
+'''
+@app.put("/api/v1/users/add")
+async def create_user(user: User, response: Response):
+    try:
+        if user.name not in list(user_df["name"]):
+            user_df.loc[len(user_df)] = [user.name, user.password, 0]
+            response.status_code = status.HTTP_201_CREATED
+            return "new user created"
+        else:
+            response.status_code = status.HTTP_403_FORBIDDEN
+            print(user_df)
+            return "user already in use"
+    except:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+ 
+
 '''
 II Nutzer anmelden und Spiel starten 
 '''
 @app.put("/api/v1/users/login")
-async def login_user(user_name: str, password: str, response: Response):
+async def login_user(name: str, password: str, response: Response):
     try:
-        if user_name not in list(user_df["user_name"]):
+        if name not in list(user_df["user_name"]):
             response.status_code = status.HTTP_403_FORBIDDEN
             return "bad credentials"
         
         else:
-            df = user_df.set_index("user_name", drop = False)
-            if password in df.loc[user_name]["password"]:
+            df = user_df.set_index("name", drop = False)
+            if password in df.loc[name]["password"]:
                 response.status_code = status.HTTP_202_ACCEPTED
                 return "successful logged in "
             else:
@@ -119,6 +155,22 @@ async def create_question(question: str, answer: str, options: str, response: Re
             return "already in place"
     except:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+'''
+V Antwort(en) hochladen
+'''
+@app.put("/api/v1/answer")
+async def add_anser(response: Response):
+    pass
+
+'''
+VI Punkteliste und Highscore aller Spieler abfragen
+'''
+#@app.get("/api/v1/users/highscore", response_model = List[Question])
+@app.get("/api/v1/users/highscore", )
+async def return_highscores(response: Response):
+    response.status_code = status.HTTP_200_OK
+    return question_df.to_dict()
 
 #user_df.loc[len(user_df),"password"] = [password]
 
