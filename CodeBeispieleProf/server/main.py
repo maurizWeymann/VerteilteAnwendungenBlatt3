@@ -10,7 +10,9 @@ app = FastAPI(
     version="1.0",
     openapi_url="/api/v1/openapi.json"
 )
+ 
 
+ 
 data = MyInventory()
 
 data.add_element(MyInventoryElement(name = "cup", quantity = 100))
