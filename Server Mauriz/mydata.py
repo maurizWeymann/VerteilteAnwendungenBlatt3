@@ -1,11 +1,11 @@
-from typing import Union
+from typing import Optional, Union
 from pydantic import BaseModel
 
 class User(BaseModel):
-    id : Union[int, None] = None
+    id : Optional[int] = None
     name : str
     password : str
-    score : Union[int, None] = 0
+    score : Optional[int]
 
 class Question(BaseModel):
     id : Union[int, None] = None
@@ -20,6 +20,16 @@ class MyUsers:
     def __init__(self):
         self.elements = list()
         self.id = 0
+
+    def add_user(self, element : User, put = False) -> int:
+        if put and element.id > 0:
+            self.id = element.id
+        else:
+            self.id += 1
+            element.id = self.id
+        
+        self.elements.append(element)
+        return element
 
     def add_element(self, element : User, put = False) -> int:
         if put and element.id > 0:

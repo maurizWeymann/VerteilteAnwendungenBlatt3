@@ -77,7 +77,7 @@ print(question_df)
 I Nutzer anlegen und speichern ohne Model
 '''
 '''
-@app.put("/api/v1/users/add")
+@app.put("/api/v1/users/adda")
 async def create_user(user_name: str, password: str, response: Response):
     try:
         if user_name not in list(user_df["user_name"]):
@@ -97,6 +97,7 @@ I Nutzer anlegen und speichern
 '''
 @app.put("/api/v1/users/add")
 async def create_user(user: User, response: Response):
+    
     try:
         if user.name not in list(user_df["name"]):
             user_df.loc[len(user_df)] = [user.name, user.password, 0]
@@ -114,15 +115,15 @@ async def create_user(user: User, response: Response):
 II Nutzer anmelden und Spiel starten 
 '''
 @app.put("/api/v1/users/login")
-async def login_user(name: str, password: str, response: Response):
+async def login_user(user: User, response: Response):
     try:
-        if name not in list(user_df["user_name"]):
+        if user.name not in list(user_df["name"]):
             response.status_code = status.HTTP_403_FORBIDDEN
             return "bad credentials"
         
         else:
             df = user_df.set_index("name", drop = False)
-            if password in df.loc[name]["password"]:
+            if user.password in df.loc[user.name]["password"]:
                 response.status_code = status.HTTP_202_ACCEPTED
                 return "successful logged in "
             else:
