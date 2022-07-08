@@ -13,13 +13,13 @@ class PutUser(BaseModel):
     password : str
 
 class Question(BaseModel):
-    question : str
-    answer : str
-    options : list[str]
-
-class GetQuestion(BaseModel):
     question_id : int
     question : str
+    options : list[str]
+
+class PutQuestion(BaseModel):
+    question : str
+    answer : str
     options : list[str]
 
 class Answer(BaseModel):

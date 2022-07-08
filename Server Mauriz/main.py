@@ -10,20 +10,15 @@ from distutils.log import error
 from hashlib import new
 from imp import reload
 from pickletools import read_uint1
-from fastapi import FastAPI, status, Response
-import os
+from fastapi import FastAPI, status, Response, Path
 import pandas as pd
-#from models import User
-#from models import Questions
-#import logic
 import uvicorn
 import random
 import time
 from typing import List
 from yaml import load
-#from user import User 
 import json
-from mydata import User, PutUser, GetQuestion, Question, PutAnswer, ScoringList, MyUsers 
+from mydata import User, PutUser, Question, PutQuestion, PutAnswer, ScoringList, MyUsers 
 
 app = FastAPI(
     docs_url="/api/v1/docs",
@@ -34,7 +29,6 @@ app = FastAPI(
 )
 
 user_data = MyUsers()
-user_data.add_element(User(name = "cup", password = "xyz123"))
 
 user_data.get_elements()
 user_df = {}
@@ -49,6 +43,8 @@ user_df = pd.DataFrame(data, columns = [
 ########################################################
 
 names = []
+question_list = []
+scoring_list = []
 
 question_df = pd.DataFrame(data, columns = [
     'id',
@@ -60,39 +56,67 @@ question_df = pd.DataFrame(data, columns = [
 
 user_df = user_df.append({"name":"mo", "password":"xyz123", "score":0}, ignore_index=True) 
 user_df = user_df.append({"name":"mau", "password":"z1", "score":0}, ignore_index=True)
-question_df = question_df.append({
-    "id":len(question_df)+1,
+#############################################
+question_list.append({
+    "question_id": 1,
     "question" : "What is the first name of Iron Man?",
-    "answer" : "Tony",
+    #"answer" : "Tony",
     "options":["Thomas","Antonio"],
-}, ignore_index=True) 
+}) 
+#############################################
 question_df = question_df.append({
     "id":len(question_df)+1,
     "question" : "Who is called the god of lightning in Avengers?",
     "answer" : "Thor",
     "options":["Thorsten","Torben"],
 }, ignore_index=True)
-print(question_df)
+question_df = question_df.append({
+    "id":len(question_df)+1,
+    "question" : "Who carries a shield of American flag theme in Avengers?",
+    "options":["Steve", "Roger"],
+    "answer" : "Captain America"
+}, ignore_index=True)
+question_df = question_df.append({
+    "id":len(question_df)+1,
+    "question" : "What is the first name of Iron Man?",
+    "options":["Thomas","Antonio"],
+    "answer" : "Tony"
+}, ignore_index=True)
+question_df = question_df.append({
+    "id":len(question_df)+1,
+    "question" : "Which avenger is green in color?",
+    "options":["Spiderman","Vision"],
+    "answer" : "Hulk"
+}, ignore_index=True)
+question_df = question_df.append({
+    "id":len(question_df)+1,
+    "question" : "Which avenger can change it's size?",
+    "options":["ChangeMan", "SizeMan"],
+    "answer" : "AntMan"
+}, ignore_index=True)
+question_df = question_df.append({
+    "id":len(question_df)+1,
+    "question" : "Which Avenger is red in color and has mind stone?",
+    "options":["MindMan","RedMan"],
+    "answer" : "Vision"
+}, ignore_index=True)
+
+#question_list.append( {"question_id" : question_df.loc[0, "id"], "question" : question_df.loc[0, "question"], "options" : question_df.loc[0, "options"] + [(question_df.loc[0, "answer"])] } )
+for index, user in user_df.iterrows() :
+    scoring_list.append({ "name" : user_df.loc[index, "name"], "score" : user_df.loc[index, "score"] })
 
 
-'''
-I Nutzer anlegen und speichern ohne Model
-'''
-'''
-@app.put("/api/v1/users/adda")
-async def create_user(user_name: str, password: str, response: Response):
-    try:
-        if user_name not in list(user_df["user_name"]):
-            user_df.loc[len(user_df)] = [user_name, password, 0]
-            response.status_code = status.HTTP_201_CREATED
-            return "new user created"
-        else:
-            response.status_code = status.HTTP_403_FORBIDDEN
-            print(user_df)
-            return "user already in use"
-    except:
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-''' 
+print( question_list.append( {
+    "question_id" : question_df.loc[0, "id"],
+    "question" : question_df.loc[0, "question"]
+    } )
+)
+
+def save_questions_to_csv():
+    question_df.to_csv('question.csv',index=False)
+    
+def load_questions_from_csv():
+    question_df = pd.read_csv('question.csv')
 
 '''
 I Nutzer anlegen und speichern 
@@ -137,19 +161,21 @@ async def login_user(user: PutUser, response: Response):
 '''
 III Fragen abrufen 
 '''
-@app.get("/api/v1/questions/{number_of_questions}", response_model=GetQuestion)
-async def load_questions(number_of_questions: int, response:Response):
+@app.get("/api/v1/questions/{number_of_questions}", response_model = List[Question])
+async def load_questions(*,number_of_questions: int = Path(title="The ID of the item to get", ge=1, le=len(question_df)), response:Response):
     response.status_code = status.HTTP_200_OK
-    return MyUsers.get_questions
-    
+    question_list = []
+    for sample in random.sample(range(0,len(question_df)),number_of_questions):
+        question_list.append( {"question_id" : question_df.loc[sample, "id"], "question" : question_df.loc[sample, "question"], "options" : question_df.loc[sample, "options"] + [(question_df.loc[sample, "answer"])] } )
+    return question_list    
 '''
 IV Fragen hochladen und speichern
 '''
 @app.put("/api/v1/questions/add")
-async def create_question(question: Question, response: Response):
+async def create_question(question: PutQuestion, response: Response):
     try:
-        if question not in list(question_df["question"]):
-            question_df.loc[len(question_df)] = [question, answer, options]
+        if question.question not in list(question_df["question"]):
+            question_df.loc[len(question_df)] = [ max(list(question_df["id"]))+1, question.question, question.answer, question.options]
             response.status_code = status.HTTP_201_CREATED
             return "new question created"
         else:
@@ -171,10 +197,14 @@ VI Punkteliste und Highscore aller Spieler abfragen
 #@app.get("/api/v1/users/highscore", response_model = List[Question])
 @app.get("/api/v1/users/highscore", response_model=ScoringList)
 async def return_highscores(response: Response):
-    response.status_code = status.HTTP_200_OK
-    return question_df.to_dict()
-
-#user_df.loc[len(user_df),"password"] = [password]
+    try:
+        scoring_list = []
+        for index, user in user_df.iterrows() :
+            scoring_list.append({ "name" : user_df.loc[index, "name"], "score" : user_df.loc[index, "score"] })
+        response.status_code = status.HTTP_200_OK
+        return {"user" : scoring_list}
+    except:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
 if __name__ == '__main__':
     uvicorn.run("main:app", host="0.0.0.0", port=22224, log_level='debug', reload = True)
