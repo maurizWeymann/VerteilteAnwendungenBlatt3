@@ -1,5 +1,6 @@
 from typing import Optional, Union
 from pydantic import BaseModel
+import json
 
 class User(BaseModel):
     id : Optional[int] = None
@@ -7,14 +8,38 @@ class User(BaseModel):
     password : str
     score : Optional[int]
 
+class PutUser(BaseModel):
+    name : str
+    password : str
+
 class Question(BaseModel):
-    id : Union[int, None] = None
     question : str
     answer : str
     options : list[str]
-    score : Union[int, None] = 0
+
+class GetQuestion(BaseModel):
+    question_id : int
+    question : str
+    options : list[str]
+
+class Answer(BaseModel):
+    question_id : int
+    answer : str
+    time : float
+
+class PutAnswer(BaseModel):
+    answer : list[Answer]
+
+class UserScore(BaseModel):
+    name : str
+    score : int
+    
+class ScoringList(BaseModel):
+    user : list[UserScore]    
+    
 
 
+    
 
 class MyUsers:
     def __init__(self):
@@ -51,6 +76,12 @@ class MyUsers:
     
     def get_elements(self) -> list:
         return self.elements
+    
+    def get_questions(number_of_questions) -> list:
+        #loads all saved questions from file
+        with open('question.json') as all_questions:
+            question_list = json.load(all_questions)
+        return question_list
     
     def get_element(self, id : int) -> User:
         for element in self.elements:

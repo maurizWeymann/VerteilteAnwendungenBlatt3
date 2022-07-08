@@ -23,7 +23,7 @@ from typing import List
 from yaml import load
 #from user import User 
 import json
-from mydata import User, Question, MyUsers    
+from mydata import User, PutUser, GetQuestion, Question, PutAnswer, ScoringList, MyUsers 
 
 app = FastAPI(
     docs_url="/api/v1/docs",
@@ -37,17 +37,19 @@ user_data = MyUsers()
 user_data.add_element(User(name = "cup", password = "xyz123"))
 
 user_data.get_elements()
-
-########################################################
-data = []
-names = []
 user_df = {}
-
+data = []
 user_df = pd.DataFrame(data, columns = [
     'name',
     'password',
     'score',
     ])
+
+
+########################################################
+
+names = []
+
 question_df = pd.DataFrame(data, columns = [
     'id',
     'question',
@@ -96,8 +98,7 @@ async def create_user(user_name: str, password: str, response: Response):
 I Nutzer anlegen und speichern 
 '''
 @app.put("/api/v1/users/add")
-async def create_user(user: User, response: Response):
-    
+async def create_user(user: PutUser, response: Response):
     try:
         if user.name not in list(user_df["name"]):
             user_df.loc[len(user_df)] = [user.name, user.password, 0]
@@ -115,7 +116,7 @@ async def create_user(user: User, response: Response):
 II Nutzer anmelden und Spiel starten 
 '''
 @app.put("/api/v1/users/login")
-async def login_user(user: User, response: Response):
+async def login_user(user: PutUser, response: Response):
     try:
         if user.name not in list(user_df["name"]):
             response.status_code = status.HTTP_403_FORBIDDEN
@@ -136,16 +137,16 @@ async def login_user(user: User, response: Response):
 '''
 III Fragen abrufen 
 '''
-@app.get("/api/v1/questions")
-async def load_questions(response:Response):
+@app.get("/api/v1/questions/{number_of_questions}", response_model=GetQuestion)
+async def load_questions(number_of_questions: int, response:Response):
     response.status_code = status.HTTP_200_OK
-    return user_df.to_dict()
+    return MyUsers.get_questions
     
 '''
 IV Fragen hochladen und speichern
 '''
 @app.put("/api/v1/questions/add")
-async def create_question(question: str, answer: str, options: str, response: Response):
+async def create_question(question: Question, response: Response):
     try:
         if question not in list(question_df["question"]):
             question_df.loc[len(question_df)] = [question, answer, options]
@@ -161,14 +162,14 @@ async def create_question(question: str, answer: str, options: str, response: Re
 V Antwort(en) hochladen
 '''
 @app.put("/api/v1/answer")
-async def add_anser(response: Response):
+async def add_anser(answer: PutAnswer, response: Response):
     pass
 
 '''
 VI Punkteliste und Highscore aller Spieler abfragen
 '''
 #@app.get("/api/v1/users/highscore", response_model = List[Question])
-@app.get("/api/v1/users/highscore", )
+@app.get("/api/v1/users/highscore", response_model=ScoringList)
 async def return_highscores(response: Response):
     response.status_code = status.HTTP_200_OK
     return question_df.to_dict()

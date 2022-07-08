@@ -1,0 +1,78 @@
+[
+    {
+        "question" : "What is the first name of Iron Man?",
+        "options":["Thomas","Antonio"],
+        "answer" : "Tony"
+    },
+    {
+        "question" : "Who is called the god of lightning in Avengers?",
+        "options":["Thorsten", "Torben"],
+        "answer" : "Thor"
+    },
+    {
+        "question" : "Who carries a shield of American flag theme in Avengers?",
+        "options":["Steve", "Roger"],
+        "answer" : "Captain America"
+    },
+    {
+        "question" : "Which avenger is green in color?",
+        "options":["Spiderman","Vision"],
+        "answer" : "Hulk"
+    },
+    {
+        "question" : "Which avenger can change it's size?",
+        "options":["ChangeMan", "SizeMan"],
+        "answer" : "AntMan"
+    },
+    {
+        "question" : "Which Avenger is red in color and has mind stone?",
+        "options":["MindMan","RedMan"],
+        "answer" : "Vision"
+    },
+    {
+        "question" : "Who was the first female superhero to appear in the title of an MCU film?",
+        "options":["Black Widow", "Gamora"],
+        "answer" : "Wasp"
+    },
+    {
+        "question" : "Who was the first major character to die?",
+        "options":["Black Widow", "Nebula"],
+        "answer" : "Heimdall"
+    },
+    {
+        "question" : "What war did Captain America fight in?",
+        "options":["World War 1","Vietnam"],
+        "answer" : "World War 2"
+    },
+    {
+        "question" : "What is the name of Thor's Hammer?",
+        "options":["Requaer","Aesir"],
+        "answer" : "Mjolnir"
+    },
+    {
+        "question" : "What is the name of Chris Pratt's character in Avengers?",
+        "options":["Spacelord","Warlord"],
+        "answer" : "Starlord"
+    },
+    {
+        "question" : "What is Captain America’s shield made of?",
+        "options":["Adamantium", "Titanium"],
+        "answer" : "Vibranium"
+    },
+    {
+        "question" : "What is Agent Coulson's first name?",
+        "options":["John", "James"],
+        "answer" : "Phil"
+    },
+    {
+        "question" : "What type of doctor is Stephen Strange?",
+        "options":["Cardiothoracic surgeon","Plastic surgeon"],
+        "answer" : "Neurosurgeon"
+    },
+    {
+        "question" : " How many Infinity Stones are there?",
+        "options":["4", "5"],
+        "answer" : "6"
+    }
+]
+
