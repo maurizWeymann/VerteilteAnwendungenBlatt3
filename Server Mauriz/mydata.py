@@ -28,6 +28,7 @@ class Answer(BaseModel):
     time : float
 
 class PutAnswer(BaseModel):
+    user_name : str
     answer : list[Answer]
 
 class UserScore(BaseModel):

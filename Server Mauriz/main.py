@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Jun 28 14:25:03 2022
+'''
+Intalliert alle nowendigen Pakete
+    pip install -r requirements.txt
+    
+Erzeugt requirements.txt
+python -m pip freeze > requirements.txt
 
-@author: 49177
-"""
+API Explanation
+https://rapidapi.com/apidojo/api/transfermarket
+
+'''
 
 from cmath import log
 from distutils.log import error
@@ -16,7 +22,7 @@ import uvicorn
 import random
 import time
 from typing import List
-from yaml import load
+
 import json
 import os
 from mydata import User, PutUser, Question, PutQuestion, PutAnswer, ScoringList, MyUsers 
@@ -47,6 +53,7 @@ user_df = pd.DataFrame(data, columns = [
 names = []
 question_list = []
 scoring_list = []
+user_id = []
 
 question_df = pd.DataFrame(data, columns = [
     'id',
@@ -206,8 +213,52 @@ async def create_question(question: PutQuestion, response: Response):
 V Antwort(en) hochladen
 '''
 @app.put("/api/v1/answer")
-async def add_anser(answer: PutAnswer, response: Response):
-    pass
+async def add_answer(answer: PutAnswer, response: Response):
+    try:
+        question_df = load_questions_from_csv()
+    except:
+        print("unable to load questions from csv file")
+    try:
+        user_df = load_users_from_csv()
+    except:
+        print("unable to load user from csv file") 
+    
+    if answer.user_name not in list(user_df["name"]):
+        response.status_code = status.HTTP_403_FORBIDDEN
+        return "user not found"
+    else:
+        response.status_code = status.HTTP_201_CREATED
+    #converts question_id to index
+    df = question_df.set_index("id", drop = False)
+    user_score = 0
+    for new_answer in answer.answer:
+        #checks time of answer check if question_id fits to answer string
+        if new_answer.time < 20 and df.loc[new_answer.question_id]["answer"] == new_answer.answer:
+            user_score +=1     
+        else:
+            user_score -=1
+    
+    user_df.at[list(user_df["name"]).index(answer.user_name),"score"] += user_score
+    if user_df.at[list(user_df["name"]).index(answer.user_name),"score"] < 0:
+        user_df.at[list(user_df["name"]).index(answer.user_name),"score"] = 0
+    
+    total_score = user_df.at[list(user_df["name"]).index(answer.user_name),"score"]
+    try:
+        save_user_to_csv(user_df)
+        response.status_code = status.HTTP_201_CREATED
+        
+        return {"user_score":int(total_score)}
+    except:
+        print("unable to save user data to csv file")
+    
+    
+    
+        
+        
+    
+    
+        
+    
 
 '''
 VI Punkteliste und Highscore aller Spieler abfragen
