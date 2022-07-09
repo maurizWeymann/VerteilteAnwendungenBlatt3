@@ -1,9 +1,16 @@
-id,question,answer,options
-1,Who is called the god of lightning in Avengers?,Thor,"['Thorsten', 'Torben']"
-2,Who carries a shield of American flag theme in Avengers?,Captain America,"['Steve', 'Roger']"
-3,Who is called the god of lightning in Avengers?,Thor,"['Thorsten', 'Torben']"
-4,Who carries a shield of American flag theme in Avengers?,Captain America,"['Steve', 'Roger']"
-5,What is the first name of Iron Man?,Tony,"['Thomas', 'Antonio']"
-6,Which avenger is green in color?,Hulk,"['Spiderman', 'Vision']"
-7,Which avenger can change it's size?,AntMan,"['ChangeMan', 'SizeMan']"
-8,Which Avenger is red in color and has mind stone?,Vision,"['MindMan', 'RedMan']"
+id;question;answer;options
+1;Who is called the god of lightning in Avengers?;Thor;['Thorsten', 'Torben']
+2;What is the first name of Iron Man?;Tony;['Thomas', 'Antonio']
+3;Who carries a shield of American flag theme in Avengers?;Captain America;['Steve', 'Roger']
+4;Which avenger is green in color?;Hulk;['Spiderman', 'Vision']
+5;Which avenger can change it's size?;AntMan;['ChangeMan', 'SizeMan']
+6;Which Avenger is red in color and has mind stone?;Vision;['MindMan', 'RedMan']
+7;Who was the first female superhero to appear in the title of an MCU film?;Wasp;['Black Widow', 'Gamora']
+8;Who was the first major character to die?;Heimdall;['Black Widow', 'Nebula']
+9;What war did Captain America fight in?;World War 2;['World War 1', 'Vietnam']
+10;What is the name of Thor's Hammer?;Mjolnir;['Requaer', 'Aesir']
+11;What is the name of Chris Pratt's character in Avengers?;Starlord;['Spacelord', 'Warlord']
+12;What is Captain America’s shield made of?;Vibranium;['Adamantium', 'Titanium']
+13;What is Agent Coulson's first name?;Phil;['John', 'James']
+14;What type of doctor is Stephen Strange?;Neurosurgeon;['Cardiothoracic surgeon', 'Plastic surgeon']
+15; How many Infinity Stones are there?;6;['4', '5']
