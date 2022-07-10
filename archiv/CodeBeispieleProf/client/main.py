@@ -1,7 +1,7 @@
 import requests
 import json
 
-URL = "http://localhost:22222/"
+URL = "http://localhost:22224/"
 
 def main():
     print("Read Data:")

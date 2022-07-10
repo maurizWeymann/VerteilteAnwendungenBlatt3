@@ -25,7 +25,7 @@ from typing import List
 
 import json
 import os
-from mydata import User, PutUser, Question, PutQuestion, PutAnswer, ScoringList, MyUsers 
+from mydata import User, PutUser, Question, PutQuestion, PutAnswer, ScoringList 
 from ast import literal_eval
 
 app = FastAPI(
@@ -36,9 +36,6 @@ app = FastAPI(
     openapi_url="/api/v1/openapi.json"
 )
 
-user_data = MyUsers()
-
-user_data.get_elements()
 user_df = {}
 data = []
 user_df = pd.DataFrame(data, columns = [
@@ -61,20 +58,6 @@ question_df = pd.DataFrame(data, columns = [
     'answer',
     'options',
     ])
-
-#############################################
-question_list.append({
-    "question_id": 1,
-    "question" : "What is the first name of Iron Man?",
-    #"answer" : "Tony",
-    "options":["Thomas","Antonio"],
-}) 
-#############################################
-
-
-#question_list.append( {"question_id" : question_df.loc[0, "id"], "question" : question_df.loc[0, "question"], "options" : question_df.loc[0, "options"] + [(question_df.loc[0, "answer"])] } )
-for index, user in user_df.iterrows() :
-    scoring_list.append({ "name" : user_df.loc[index, "name"], "score" : user_df.loc[index, "score"] })
 
 
 '''
@@ -176,7 +159,7 @@ async def load_questions(*,number_of_questions: int = Path(title="The ID of the 
     try:
         question_list = []
         for sample in random.sample(range(0,len(question_df)),number_of_questions):
-            question_list.append( {"question_id" : question_df.loc[sample, "id"], "question" : question_df.loc[sample, "question"], "options" : question_df.loc[sample, "options"] + [question_df.loc[sample, "answer"]]  } )
+            question_list.append( {"question_id" : question_df.loc[sample, "id"], "question" : question_df.loc[sample, "question"], "options" : random.sample( question_df.loc[sample, "options"] + [question_df.loc[sample, "answer"]], 3 )  } )
         print(question_list)
         response.status_code = status.HTTP_200_OK
         return question_list
