@@ -1,7 +1,4 @@
 import hashlib
-import itertools
-import string
-import sys
 import timeit
 
 start = timeit.default_timer()
@@ -14,9 +11,8 @@ def crackHash():
     "0ebb429fa86d481c2630fac53db1c91cffed5d4d41d1021c179444eb67e7ee0b"]
     
     for hash in arr:
-        
         try: 
-            passFile = open("test.txt", "r")
+            passFile = open("dictionary.txt", "r")
         except:
             print("Could not find the file!")
         for word in passFile:
