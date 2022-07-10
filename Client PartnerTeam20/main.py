@@ -21,7 +21,7 @@ global score
 import requests
 import json
 
-URL = "http://localhost:22224/"
+URL = "http://localhost:22222/"
 
 '''
 starts the overall login or registration process, return user name
@@ -51,29 +51,25 @@ def login():
     print('If you want to exit, simply write \'exit\'.')
     name = input("Enter Login Username: ")
     if name != 'exit':
-        password = input("Enter Password: ")
+        #password = input("Enter Password: ")
         try:
-            payload=json.dumps({"name" : name, "password" : password})
+            name = "string"
+            payload=json.dumps({})
             headers={"Content-Type": "application/json"}
-            response = requests.request("PUT", URL + "api/v1/users/login", headers=headers, data=payload)
+            response = requests.request("GET", URL + "v1/users/name/"+str(name), headers=headers, data=payload)
             #print(f"Status: {response.status_code}, Data: {response.json()}")
+            data = response.json()[0]
+            #print(data["ID"])
         except requests.exceptions.RequestException as e:
             print(f"Server not found: {e}'")
-        if response.status_code == 202:
-            print(response.json())
+        if response.status_code == 200:
+            #print(response.json())
             time.sleep(2)
-        elif response.status_code == 401:
-            print(response.json())
-            print('please try again')
-            time.sleep(2)
-            login()     
-        elif response.status_code == 403:
-            print(response.json())
-            print('please try again')
+        else:
             time.sleep(2)
             login()
             
-        StartGame(name)
+        StartGame(name, data["ID"] )
     else:
         collectcredentials()
 
@@ -106,41 +102,43 @@ def register():
         os.system('cls')
         print('Name to long, please choose shorter name')
         register()
-    password = input("Choose Password: ")
+    #password = input("Choose Password: ")
     try:
-        payload=json.dumps({"name" : name, "password" : password})
+        name = "string"
+        payload=json.dumps({"name" : name, "score" : 100})
         headers={"Content-Type": "application/json"}
-        response = requests.request("PUT", URL + "api/v1/users/add", headers=headers, data=payload)
+        response = requests.request("POST", URL + "v1/users", headers=headers, data=payload)
         #print(f"Status: {response.status_code}, Data: {response.json()}")
     except requests.exceptions.RequestException as e:
         print(f"Server not found: {e}'")
     
-    if response.status_code == 201:
-        print(response.json())
+    if response.status_code == 200:
+        print("your name is registered now")
         time.sleep(2)
-        StartGame(name)
-    elif response.status_code == 403:
+        login()
+    elif response.status_code == 404:
         print(response.json())
         time.sleep(2)
         print('please try again')
         collectcredentials()     
        
-def StartGame(name):
+def StartGame(name, user_id):
     questions = getQuestions()
     countdown(3)
     answers = quiz(questions)
-    pushAnswer(name, answers)
+    pushAnswer(user_id, name, answers)
     os.system('cls')
     print(f"Thanks for playing {name}! 💜\n\n")
     getHighscore()
 
 def quiz(questions):
     answer_list = []
+    
     for question in questions:
         os.system('cls')
         startTimer = time.time()
-        print(question["question"])
-        print(f'a) {question["options"][0]} b) {question["options"][1]} c) {question["options"][2]} ')
+        print(question["Question"])
+        print(f'a) {question["Answer1"]} b) {question["Answer2"]} c) {question["Answer3"]} ')
         choive_eval= False
         choice = input("Answer: ").lower()
         if choice == "a" or choice == "b" or choice == "c":
@@ -155,14 +153,14 @@ def quiz(questions):
                 
         duration = round(time.time() - startTimer, 2)
         if choice == "a":
-            choice = choice.replace("a", f'{question["options"][0]}')
+            choice = choice.replace("a", "1")
         if choice == "b":
-            choice = choice.replace("b", f'{question["options"][1]}')
+            choice = choice.replace("b", "2")
         if choice == "c":
-            choice = choice.replace("c", f'{question["options"][2]}')
+            choice = choice.replace("c", "3")
             
         
-        answer_list.append({"question_id":question["question_id"], "answer": choice, "time":duration})
+        answer_list.append({"question_id":question["ID"], "answer": choice})
         #print(answer_list)
     return answer_list 
 
@@ -188,7 +186,7 @@ def getQuestions():
     try:
         payload={}
         headers={"Content-Type": "application/json"}
-        response = requests.request("GET", URL + f"api/v1/questions/{qs}", headers=headers, data=payload)
+        response = requests.request("GET", URL + f"v1/questions/amount/{qs}", headers=headers, data=payload)
         #print(f"Status: {response.status_code}, Data: {response.json()}")
     
     except requests.exceptions.RequestException as e:
@@ -197,31 +195,35 @@ def getQuestions():
     return response.json()
 
      
-def pushAnswer(name, answer):
-    try:
-        payload=json.dumps({"user_name" : name, "answer" : answer})
-        headers={"Content-Type": "application/json"}
-        response = requests.request("PUT", URL + "api/v1/answer", headers=headers, data=payload)
-        #print(f"Status: {response.status_code}, Data: {response.json()}")
-    except requests.exceptions.RequestException as e:
-        print(f"Server not found: {e}'")
-    
+def pushAnswer(user_id, name, answers):
+    for answer in answers:
+        try:
+            
+            payload={}
+            headers={}
+            response = requests.request("POST", URL + f"v1/answer/{answer['question_id']}/{answer['answer']}/{name}", headers=headers, data=payload)
+            #print(f"Status: {response.status_code}, Data: {response.json()}")
+        except requests.exceptions.RequestException as e:
+            print(f"Server not found: {e}'")
+        
 def getHighscore():
     try:
         payload={}
         headers={"Content-Type": "application/json"}
-        response = requests.request("GET", URL + f"api/v1/users/highscore", headers=headers, data=payload)
+        response = requests.request("GET", URL + f"v1/users", headers=headers, data=payload)
         #print(f"Status: {response.status_code}, Data: {response.json()}")
+        
     
     except requests.exceptions.RequestException as e:
         print(f"Server not found: {e}'")
     
     print('HighscoreList:\n-------------') 
     scoring_list = response.json()
-    for user in scoring_list["user"]:
-        user_name = user["name"]
-        user_score = str(user['score'])
+    for user in scoring_list:
+        user_name = user["Name"]
+        user_score = str(user['Score'])
         print(f"{user_score.rjust(3,' ')} - {user_name}")
+        
     print('-------------') 
     
 def countdown(timer):
